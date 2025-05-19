@@ -24,6 +24,7 @@
       color: white;
       text-shadow: 0 2px 5px rgba(0,0,0,0.5);
       pointer-events: none;
+      z-index: 5;
     }
 
     .header h1 {
@@ -38,30 +39,17 @@
       margin-top: 10px;
     }
 
-    .cps {
-      font-size: 1.2rem;
-      margin-top: 5px;
-    }
-
-    .notification {
-      position: fixed;
-      top: 10px;
+    .cps-box {
+      position: absolute;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.5);
       color: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 1rem;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      z-index: 999;
-    }
-
-    .notification img {
-      width: 30px;
-      height: 30px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      z-index: 5;
     }
 
     .popcat {
@@ -89,29 +77,101 @@
 
     footer {
       position: absolute;
-      bottom: 10px;
+      bottom: 5px;
       width: 100%;
       text-align: center;
       color: rgba(255, 255, 255, 0.6);
       font-size: 0.9rem;
     }
+
+    /* Settings button */
+    .settings-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .settings-panel {
+      position: absolute;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .settings-panel button {
+      background: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .notification {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 1rem;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    .notification img {
+      height: 30px;
+      width: 30px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="notification" id="achievement-notif">
-    <img src="" id="notif-img" alt="achievement" />
-    <span id="notif-text"></span>
-  </div>
-
   <div class="header">
     <h1>Click The Wowo</h1>
     <div class="scoreboard"><span id="click-count">0</span></div>
-    <div class="cps">Klik per detik: <span id="cps">0</span></div>
   </div>
 
+  <!-- CPS Box -->
+  <div class="cps-box">CPS: <span id="cps">0</span></div>
+
+  <!-- Popcat Clickable Image -->
   <div class="popcat" tabindex="0" id="popcat">
     <img src="wowo trn.png" alt="Wowo" id="popcat-image" />
+  </div>
+
+  <!-- Settings Button -->
+  <button class="settings-btn" id="settings-toggle">⚙️</button>
+  <div class="settings-panel" id="settings-panel">
+    <button id="toggle-sound">🔊 Suara: Aktif</button>
+    <button id="reset-clicks">🔄 Reset Klik</button>
+  </div>
+
+  <!-- Notification for Achievements -->
+  <div class="notification" id="notification">
+    <img src="" id="notif-img" />
+    <span id="notif-msg"></span>
   </div>
 
   <footer>&copy; Made by Katss</footer>
@@ -121,31 +181,36 @@
       const popcatDiv = document.getElementById('popcat');
       const popcatImage = document.getElementById('popcat-image');
       const clickCountDisplay = document.getElementById('click-count');
+      const resetButton = document.getElementById('reset-clicks');
+      const toggleSoundButton = document.getElementById('toggle-sound');
+      const settingsToggle = document.getElementById('settings-toggle');
+      const settingsPanel = document.getElementById('settings-panel');
       const cpsDisplay = document.getElementById('cps');
-      const notifBox = document.getElementById('achievement-notif');
-      const notifText = document.getElementById('notif-text');
+      const notifBox = document.getElementById('notification');
       const notifImg = document.getElementById('notif-img');
+      const notifMsg = document.getElementById('notif-msg');
 
       const meowAudio = new Audio('hidup-jokowi.mp3');
       meowAudio.preload = 'auto';
 
       let clickCount = Number(localStorage.getItem('clickCount')) || 0;
       let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
-      let clicksInSecond = 0;
-      let achievements = new Set();
-
-      const achievementData = [
-        { count: 100, text: "Hebat! 100 klik!", img: "a1.png" },
-        { count: 500, text: "Luar biasa! 500 klik!", img: "a2.png" },
-        { count: 1000, text: "Seribu klik! Anda Gila!", img: "a3.png" },
-        { count: 2000, text: "2000 klik! Mesin kah?", img: "a4.png" },
-        { count: 10000, text: "10K klik! WOW", img: "a5.png" },
-        { count: 15000, text: "15K klik! Sangat berdedikasi!", img: "a6.png" },
-        { count: 55000, text: "55K klik! Legenda hidup!", img: "a7.png" },
-        { count: 1705070, text: "Juara Sejati!", img: "a8.png" },
-      ];
+      let clickTimestamps = [];
 
       clickCountDisplay.textContent = clickCount;
+      toggleSoundButton.textContent = soundEnabled ? '🔊 Suara: Aktif' : '🔇 Suara: Mati';
+
+      const achievements = [
+        { count: 100, msg: "Keren! 100 klik!", img: "a1.png" },
+        { count: 500, msg: "Hebat! 500 klik!", img: "a2.png" },
+        { count: 1000, msg: "Seribu klik! 🔥", img: "a3.png" },
+        { count: 2000, msg: "2000 klik! Kamu luar biasa!", img: "a4.png" },
+        { count: 10000, msg: "Wow 10.000 klik!", img: "a5.png" },
+        { count: 15000, msg: "Gila! 15.000 klik!", img: "a6.png" },
+        { count: 55000, msg: "Master Klik sejati!", img: "a7.png" },
+        { count: 1705070, msg: "Legenda Wowo!", img: "a8.png" }
+      ];
+      let achieved = {};
 
       function playSound() {
         if (!soundEnabled) return;
@@ -161,30 +226,12 @@
         }, 150);
       }
 
-      function showAchievement(text, img) {
-        notifText.textContent = text;
-        notifImg.src = img;
-        notifBox.style.display = 'flex';
-        setTimeout(() => {
-          notifBox.style.display = 'none';
-        }, 3000);
-      }
-
-      function checkAchievement() {
-        for (const a of achievementData) {
-          if (clickCount >= a.count && !achievements.has(a.count)) {
-            achievements.add(a.count);
-            showAchievement(a.text, a.img);
-          }
-        }
-      }
-
       function incrementClick() {
         clickCount++;
-        clicksInSecond++;
         clickCountDisplay.textContent = clickCount;
         localStorage.setItem('clickCount', clickCount.toString());
-        checkAchievement();
+        checkAchievements(clickCount);
+        recordClickTime();
       }
 
       function handleClick() {
@@ -193,21 +240,66 @@
         animatePopcat();
       }
 
+      function toggleSettings() {
+        settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
+      }
+
+      function checkAchievements(count) {
+        for (let ach of achievements) {
+          if (count === ach.count && !achieved[ach.count]) {
+            achieved[ach.count] = true;
+            showNotification(ach.msg, ach.img);
+          }
+        }
+      }
+
+      function showNotification(message, imgSrc) {
+        notifMsg.textContent = message;
+        notifImg.src = imgSrc;
+        notifBox.style.display = 'flex';
+        setTimeout(() => {
+          notifBox.style.display = 'none';
+        }, 3000);
+      }
+
+      function recordClickTime() {
+        const now = Date.now();
+        clickTimestamps.push(now);
+        clickTimestamps = clickTimestamps.filter(ts => now - ts <= 1000);
+        cpsDisplay.textContent = clickTimestamps.length;
+      }
+
+      // Event listeners
       popcatDiv.addEventListener('click', handleClick);
       popcatDiv.addEventListener('touchstart', (e) => {
         e.preventDefault();
         handleClick();
       });
 
-      window.addEventListener('keydown', () => {
-        handleClick();
+      window.addEventListener('keydown', () => handleClick());
+
+      resetButton.addEventListener('click', () => {
+        clickCount = 0;
+        clickCountDisplay.textContent = '0';
+        localStorage.setItem('clickCount', '0');
+        achieved = {};
       });
 
-      // Update CPS
+      toggleSoundButton.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('soundEnabled', soundEnabled.toString());
+        toggleSoundButton.textContent = soundEnabled ? '🔊 Suara: Aktif' : '🔇 Suara: Mati';
+      });
+
+      settingsToggle.addEventListener('click', toggleSettings);
+
+      // CPS interval update (fallback in case of lag)
       setInterval(() => {
-        cpsDisplay.textContent = clicksInSecond;
-        clicksInSecond = 0;
-      }, 1000);
+        const now = Date.now();
+        clickTimestamps = clickTimestamps.filter(ts => now - ts <= 1000);
+        cpsDisplay.textContent = clickTimestamps.length;
+      }, 500);
+
     })();
   </script>
 </body>
