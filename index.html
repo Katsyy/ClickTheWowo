@@ -10,9 +10,15 @@
       padding: 0;
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('image.jpg') no-repeat center center fixed;
+      background: url('1000153299.jpg') no-repeat center center fixed;
       background-size: cover;
       overflow: hidden;
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none;   /* Safari */
+      -khtml-user-select: none;    /* Konqueror HTML */
+      -moz-user-select: none;      /* Firefox */
+      -ms-user-select: none;       /* Internet Explorer/Edge */
+      user-select: none;           /* Non-prefixed version, Chrome and Opera */
     }
 
     .header {
@@ -46,17 +52,18 @@
       cursor: pointer;
       user-select: none;
       outline: none;
+      -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di Android */
+      touch-action: manipulation; /* Mencegah delay klik di mobile */
     }
 
     #popcat-image {
       width: 300px;
       height: auto;
       transition: transform 0.1s ease-in-out;
-
-      /* Tambahan agar gambar tidak bisa diseleksi atau di-drag */
       user-select: none;
       -webkit-user-drag: none;
       pointer-events: auto;
+      -webkit-touch-callout: none;
     }
 
     #popcat-image.clicked {
@@ -70,6 +77,7 @@
       text-align: center;
       color: rgba(255, 255, 255, 0.6);
       font-size: 0.9rem;
+      user-select: none;
     }
   </style>
 </head>
@@ -119,6 +127,10 @@
       }
 
       popcatDiv.addEventListener('click', handleClick);
+      popcatDiv.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Hindari tap & hold
+        handleClick();
+      });
       popcatDiv.addEventListener('keydown', (e) => {
         if (e.key === ' ' || e.key === 'Enter') {
           e.preventDefault();
