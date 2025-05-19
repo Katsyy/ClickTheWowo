@@ -38,28 +38,48 @@
       margin-top: 10px;
     }
 
-    .controls {
+    .settings-button {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      cursor: pointer;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      font-size: 1.5rem;
+    }
+
+    .settings-panel {
+      position: absolute;
+      bottom: 80px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
       flex-direction: column;
       gap: 10px;
       z-index: 10;
     }
 
-    .controls button {
+    .settings-panel button {
       padding: 8px 14px;
       font-size: 1rem;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(0, 0, 0, 0.1);
       transition: background 0.3s;
     }
 
-    .controls button:hover {
-      background: rgba(255, 255, 255, 1);
+    .settings-panel button:hover {
+      background: rgba(0, 0, 0, 0.2);
     }
 
     .popcat {
@@ -97,11 +117,6 @@
 </head>
 <body>
 
-  <div class="controls">
-    <button id="toggle-sound">🔊 Suara: Aktif</button>
-    <button id="reset-clicks">🔄 Reset Klik</button>
-  </div>
-
   <div class="header">
     <h1>Click The Wowo</h1>
     <div class="scoreboard"><span id="click-count">0</span></div>
@@ -109,6 +124,13 @@
 
   <div class="popcat" tabindex="0" id="popcat">
     <img src="wowo trn.png" alt="Wowo" id="popcat-image" />
+  </div>
+
+  <!-- Tombol Pengaturan dan Panel -->
+  <button class="settings-button" id="settings-button">⚙️</button>
+  <div class="settings-panel" id="settings-panel">
+    <button id="toggle-sound">🔊 Suara: Aktif</button>
+    <button id="reset-clicks">🔄 Reset Klik</button>
   </div>
 
   <footer>&copy; Made by Katss</footer>
@@ -120,14 +142,15 @@
       const clickCountDisplay = document.getElementById('click-count');
       const resetButton = document.getElementById('reset-clicks');
       const toggleSoundButton = document.getElementById('toggle-sound');
+      const settingsButton = document.getElementById('settings-button');
+      const settingsPanel = document.getElementById('settings-panel');
 
       const meowAudio = new Audio('hidup-jokowi.mp3');
       meowAudio.preload = 'auto';
 
       let clickCount = Number(localStorage.getItem('clickCount')) || 0;
-      let soundEnabled = localStorage.getItem('soundEnabled') !== 'false'; // default true
+      let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
 
-      // Set UI awal
       clickCountDisplay.textContent = clickCount;
       toggleSoundButton.textContent = soundEnabled ? '🔊 Suara: Aktif' : '🔇 Suara: Mati';
 
@@ -157,30 +180,30 @@
         animatePopcat();
       }
 
-      // Event click/touch
       popcatDiv.addEventListener('click', handleClick);
       popcatDiv.addEventListener('touchstart', (e) => {
         e.preventDefault();
         handleClick();
       });
 
-      // Keyboard (semua tombol)
       window.addEventListener('keydown', () => {
         handleClick();
       });
 
-      // Tombol reset
       resetButton.addEventListener('click', () => {
         clickCount = 0;
         localStorage.setItem('clickCount', '0');
         clickCountDisplay.textContent = '0';
       });
 
-      // Toggle suara
       toggleSoundButton.addEventListener('click', () => {
         soundEnabled = !soundEnabled;
         localStorage.setItem('soundEnabled', soundEnabled.toString());
         toggleSoundButton.textContent = soundEnabled ? '🔊 Suara: Aktif' : '🔇 Suara: Mati';
+      });
+
+      settingsButton.addEventListener('click', () => {
+        settingsPanel.style.display = settingsPanel.style.display === 'flex' ? 'none' : 'flex';
       });
     })();
   </script>
