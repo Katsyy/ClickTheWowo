@@ -13,12 +13,12 @@
       background: url('image.jpg') no-repeat center center fixed;
       background-size: cover;
       overflow: hidden;
-      -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none;   /* Safari */
-      -khtml-user-select: none;    /* Konqueror HTML */
-      -moz-user-select: none;      /* Firefox */
-      -ms-user-select: none;       /* Internet Explorer/Edge */
-      user-select: none;           /* Non-prefixed version, Chrome and Opera */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .header {
@@ -52,8 +52,8 @@
       cursor: pointer;
       user-select: none;
       outline: none;
-      -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di Android */
-      touch-action: manipulation; /* Mencegah delay klik di mobile */
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     #popcat-image {
@@ -95,12 +95,15 @@
 
   <script>
     (function () {
-      let clickCount = 0;
       const popcatDiv = document.getElementById('popcat');
       const popcatImage = document.getElementById('popcat-image');
       const clickCountDisplay = document.getElementById('click-count');
       const meowAudio = new Audio('hidup-jokowi.mp3');
       meowAudio.preload = 'auto';
+
+      // Ambil jumlah klik dari localStorage atau mulai dari 0
+      let clickCount = parseInt(localStorage.getItem('clickCount')) || 0;
+      clickCountDisplay.textContent = clickCount;
 
       function playSound() {
         meowAudio.pause();
@@ -118,6 +121,7 @@
       function incrementClick() {
         clickCount++;
         clickCountDisplay.textContent = clickCount;
+        localStorage.setItem('clickCount', clickCount); // Simpan ke localStorage
       }
 
       function handleClick() {
@@ -128,7 +132,7 @@
 
       popcatDiv.addEventListener('click', handleClick);
       popcatDiv.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Hindari tap & hold
+        e.preventDefault();
         handleClick();
       });
       popcatDiv.addEventListener('keydown', (e) => {
