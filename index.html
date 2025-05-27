@@ -197,19 +197,17 @@
 
       const achievements = [
         { count: 100, msg: "Kroco wak", img: "apabila.jpg", sound: "bawadehewak.mp3" },
-        { count: 500, msg: "Sigma", img: "a2.png", sound: "a2.mp3" },
-        { count: 911, msg: "no shiee", img: "a8.png", sound: "a8.mp3" },
-        { count: 1000, msg: "Hidup Jokowi 🔥", img: "a3.png", sound: "a3.mp3" },
-        { count: 2000, msg: "nguawor cik", img: "a4.png", sound: "a4.mp3" },
-        { count: 2045, msg: "2045 Indonesia (c)emas!", img: ".png", sound: "a9.mp3" },
-        { count: 10000, msg: "Wiwokdetok", img: "a5.png", sound: "a5.mp3" },
-        { count: 15000, msg: "Fikss autoclicker", img: "a6.png", sound: "a6.mp3" },
-        { count: 55000, msg: "Ngecit jirrr", img: "a7.png", sound: "a7.mp3" },
-        { count: 100000, msg: "unemployee (pengangguran)", img: ".png", sound: "a10.mp3" },
-        { count: 170507, msg: "Tanggal lahir dev Katss", img: "a8.png", sound: "a8.mp3" },
-        { count: 1000000, msg: "touch some grass", img: ".png", sound: "a11.mp3" },
-        { count: 1234567, msg: "hell nahh", img: ".png", sound: "a12.mp3" },
-        { count: 2000000, msg: "unemployee final boss", img: ".png", sound: "a13.mp3" }
+        { count: 500, msg: "Sigma", img: "sigma.jpg", sound: "omaga.mp3" },
+        { count: 1000, msg: "Hidup Jokowi 🔥", img: "aku-capres.jpg", sound: "pipa.mp3" },
+        { count: 2000, msg: "nguawor cik", img: "nguawor.jpg", sound: "dungwob.mp3" },
+        { count: 2045, msg: "2045 Indonesia (c)emas!", img: "indonesia-emas.jpg", sound: "snore.mp3" },
+        { count: 10000, msg: "Wiwokdetok", img: "wiwokdetok.jpg", sound: "wiwokdetok.mp3" },
+        { count: 15000, msg: "Fikss autoclicker", img: "rusdi.jpg", sound: "aduhgantengnya.mp3" },
+        { count: 55000, msg: "Ngecit jirrr", img: "hengker.jpg", sound: "jancukpristel.mp3" },
+        { count: 100000, msg: "unemployee (pengangguran)", img: "hitam.jpg", sound: "nguhaha.mp3" },
+        { count: 1000000, msg: "touch some grass", img: "touchsomegrass.jpg", sound: "jawajawa.mp3" },
+        { count: 1234567, msg: "hell nahh", img: "ino.jpg", sound: "cihuy.mp3" },
+        { count: 2000000, msg: "unemployee final boss", img: "omkegas.jpg", sound: "omkegas.mp3" }
       ];
       let achieved = {};
 
@@ -222,8 +220,13 @@
 
       function playAchievementSound(src) {
         if (!soundEnabled) return;
+        meowAudio.pause();
         const audio = new Audio(src);
         audio.play().catch(() => {});
+        audio.addEventListener('ended', () => {
+          meowAudio.currentTime = 0;
+          meowAudio.play().catch(() => {});
+        });
       }
 
       function animatePopcat() {
@@ -255,19 +258,19 @@
         for (let ach of achievements) {
           if (count === ach.count && !achieved[ach.count]) {
             achieved[ach.count] = true;
-            showNotification(ach.msg, ach.img, ach.sound);
+            showNotification(ach.msg, ach.img, ach.sound, count);
           }
         }
       }
 
-      function showNotification(message, imgSrc, soundSrc) {
-        notifMsg.textContent = message;
+      function showNotification(message, imgSrc, soundSrc, count) {
+        notifMsg.textContent = `🎉 Achievement didapatkan: ${count} klik – ${message}`;
         notifImg.src = imgSrc;
         notifBox.style.display = 'flex';
         if (soundSrc) playAchievementSound(soundSrc);
         setTimeout(() => {
           notifBox.style.display = 'none';
-        }, 3000);
+        }, 5000);
       }
 
       function recordClickTime() {
@@ -283,7 +286,22 @@
         handleClick();
       });
 
-      window.addEventListener('keydown', () => handleClick());
+      // === Anti Spam Keyboard: Semua tombol tapi tahan tidak spam ===
+      const isPC = !/Mobi|Android/i.test(navigator.userAgent);
+      let pressedKeys = {};
+
+      if (isPC) {
+        window.addEventListener('keydown', (e) => {
+          if (!pressedKeys[e.code]) {
+            pressedKeys[e.code] = true;
+            handleClick();
+          }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          pressedKeys[e.code] = false;
+        });
+      }
 
       resetButton.addEventListener('click', () => {
         clickCount = 0;
@@ -305,6 +323,31 @@
         clickTimestamps = clickTimestamps.filter(ts => now - ts <= 1000);
         cpsDisplay.textContent = clickTimestamps.length;
       }, 500);
+
+      // Easter Egg
+      const secretCode = ['a', 'd', 'm', 'i', 'n', '6'];
+      let inputSequence = [];
+
+      if (isPC) {
+        window.addEventListener('keydown', (e) => {
+          inputSequence.push(e.key);
+          if (inputSequence.length > secretCode.length) {
+            inputSequence.shift();
+          }
+          if (JSON.stringify(inputSequence) === JSON.stringify(secretCode)) {
+            const jumlah = prompt("kok anda tau kode rahasia?");
+            const parsed = parseInt(jumlah);
+            if (!isNaN(parsed) && parsed >= 0) {
+              clickCount = parsed;
+              clickCountDisplay.textContent = parsed;
+              localStorage.setItem('clickCount', parsed.toString());
+              alert("Jumlah klik diatur ke " + parsed);
+            }
+            inputSequence = [];
+          }
+        });
+      }
+
     })();
   </script>
 </body>
