@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Click The Wowo!</title>
+   <link rel="icon" type="image/png" href="wowo trn.png" />
   <style>
     html, body {
       margin: 0;
@@ -286,7 +287,6 @@
         handleClick();
       });
 
-      // === Anti Spam Keyboard: Semua tombol tapi tahan tidak spam ===
       const isPC = !/Mobi|Android/i.test(navigator.userAgent);
       let pressedKeys = {};
 
@@ -324,7 +324,6 @@
         cpsDisplay.textContent = clickTimestamps.length;
       }, 500);
 
-      // Easter Egg
       const secretCode = ['a', 'd', 'm', 'i', 'n', '6'];
       let inputSequence = [];
 
